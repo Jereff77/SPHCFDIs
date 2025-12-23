@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  email-processor:
+    build: .
+    container_name: sph-email-processor
+    restart: unless-stopped
+    environment:
+      # Variables de entorno - estas deben configurarse en Easy Panel
+      - IMAP_SERVER=${IMAP_SERVER:-imap.hostinger.com}
+      - IMAP_PORT=${IMAP_PORT:-993}
+      - IMAP_USER=${IMAP_USER}
+      - IMAP_PASSWORD=${IMAP_PASSWORD}
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
+      - POLLING_INTERVAL=${POLLING_INTERVAL:-60}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    volumes:
+      # Montar volumen persistente para logs
+      - email-processor-logs:/app/logs
+      # Montar volumen para sesiones/contexto
+      - email-processor-sessions:/app/.sessions
+    networks:
+      - email-processor-network
+
+volumes:
+  email-processor-logs:
+    driver: local
+  email-processor-sessions:
+    driver: local
+
+networks:
+  email-processor-network:
+    driver: bridge
