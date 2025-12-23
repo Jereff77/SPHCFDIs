@@ -35,7 +35,7 @@ class Config:
     SCHEDULE_TIMEZONE = os.getenv('SCHEDULE_TIMEZONE', 'America/Mexico_City')
 
     # Tabla de base de datos
-    TABLE_NAME = 'catFacturas'
+    TABLE_NAME = os.getenv('TABLE_NAME', 'catFacturas')
 
     @classmethod
     def validate_config(cls):
@@ -45,13 +45,25 @@ class Config:
             'SUPABASE_URL', 'SUPABASE_KEY'
         ]
 
+        # Configuraciones opcionales pero recomendadas
+        optional_configs = ['TABLE_NAME']
+
         missing_configs = []
         for config in required_configs:
             if not getattr(cls, config):
                 missing_configs.append(config)
 
         if missing_configs:
-            raise ValueError(f"Faltan las siguientes configuraciones: {', '.join(missing_configs)}")
+            raise ValueError(f"Faltan las siguientes configuraciones requeridas: {', '.join(missing_configs)}")
+
+        # Advertir sobre configuraciones opcionales no definidas
+        missing_optional = []
+        for config in optional_configs:
+            if not getattr(cls, config):
+                missing_optional.append(config)
+
+        if missing_optional:
+            print(f"ADVERTENCIA: Las siguientes configuraciones opcionales no están definidas, usando valores predeterminados: {', '.join(missing_optional)}")
 
         return True
 
